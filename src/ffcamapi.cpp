@@ -25,6 +25,10 @@ typedef struct
     pthread_cond_t read_cond;
     int frame_count;
     std::deque<camera_buffer_t*> frames;
+    void (*write_callback)(ffcamera_context *ffc_context, const uint8_t *buf, ssize_t size, void *arg);
+    void *write_callback_arg;
+    void (*close_callback)(ffcamera_context *ffc_context, void *arg);
+    void *close_callback_arg;
 } ffcamera_reserved;
 
 void* encoding_thread(void* arg);
@@ -33,16 +37,41 @@ void ffcamera_init(ffcamera_context *ffc_context)
 {
     ffc_context->codec_context = NULL;
     ffc_context->fd = 0;
-    ffc_context->write_callback = NULL;
 
     ffcamera_reserved *ffc_reserved = (ffcamera_reserved*) malloc(sizeof(ffcamera_reserved));
     ffc_context->reserved = ffc_reserved;
     ffc_reserved->frame_count = 0;
     ffc_reserved->running = true;
     ffc_reserved->frames.clear();
+    ffc_reserved->write_callback = NULL;
+    ffc_reserved->write_callback_arg = NULL;
+    ffc_reserved->close_callback = NULL;
+    ffc_reserved->close_callback_arg = NULL;
 
     pthread_mutex_init(&ffc_reserved->reading_mutex, 0);
     pthread_cond_init(&ffc_reserved->read_cond, 0);
+}
+
+ffcamera_error ffcamera_set_close_callback(ffcamera_context *ffc_context,
+        void (*close_callback)(ffcamera_context *ffc_context, void *arg),
+        void *arg)
+{
+    ffcamera_reserved *ffc_reserved = (ffcamera_reserved*) ffc_context->reserved;
+    if (!ffc_reserved) return FFCAMERA_NOT_INITIALIZED;
+    ffc_reserved->close_callback = close_callback;
+    ffc_reserved->close_callback_arg = arg;
+    return FFCAMERA_OK;
+}
+
+ffcamera_error ffcamera_set_write_callback(ffcamera_context *ffc_context,
+        void (*write_callback)(ffcamera_context *ffc_context, const uint8_t *buf, ssize_t size, void *arg),
+        void *arg)
+{
+    ffcamera_reserved *ffc_reserved = (ffcamera_reserved*) ffc_context->reserved;
+    if (!ffc_reserved) return FFCAMERA_NOT_INITIALIZED;
+    ffc_reserved->write_callback = write_callback;
+    ffc_reserved->write_callback_arg = arg;
+    return FFCAMERA_OK;
 }
 
 ffcamera_error ffcamera_default_codec(enum CodecID codec_id,
@@ -196,8 +225,9 @@ void* encoding_thread(void* arg)
 
         if (success == 0 && got_packet > 0)
         {
-            if (!ffc_context->write_callback) write_all(fd, packet.data, packet.size);
-            else ffc_context->write_callback(packet.data, packet.size);
+            if (!ffc_reserved->write_callback) write_all(fd, packet.data, packet.size);
+            else ffc_reserved->write_callback(ffc_context, packet.data, packet.size,
+                    ffc_reserved->write_callback_arg);
         }
 
         free(buf->framebuf);
@@ -210,7 +240,7 @@ void* encoding_thread(void* arg)
 
     do
     {
-        int frame_position = ffc_reserved->frame_count++;
+        ffc_reserved->frame_count++;
 
         // reset the AVPacket
         av_init_packet(&packet);
@@ -222,8 +252,9 @@ void* encoding_thread(void* arg)
 
         if (success == 0 && got_packet > 0)
         {
-            if (!ffc_context->write_callback) write_all(fd, packet.data, packet.size);
-            else ffc_context->write_callback(packet.data, packet.size);
+            if (!ffc_reserved->write_callback) write_all(fd, packet.data, packet.size);
+            else ffc_reserved->write_callback(ffc_context, packet.data, packet.size,
+                    ffc_reserved->write_callback_arg);
         }
     }
     while (got_packet > 0);
@@ -231,6 +262,9 @@ void* encoding_thread(void* arg)
     av_free(encode_buffer);
     encode_buffer = NULL;
     encode_buffer_len = 0;
+
+    if (ffc_reserved->close_callback)
+    ffc_reserved->close_callback(ffc_context, ffc_reserved->close_callback_arg);
 
     return 0;
 }

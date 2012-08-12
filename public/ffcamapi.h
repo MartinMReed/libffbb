@@ -16,9 +16,17 @@
 #ifndef FFCAMAPI_H
 #define FFCAMAPI_H
 
+// include math.h otherwise it will get included
+// by avformat.h and cause duplicate definition
+// errors because of C vs C++ functions
+#include <math.h>
+
+extern "C"
+{
 #define UINT64_C uint64_t
 #define INT64_C int64_t
 #include <libavformat/avformat.h>
+}
 
 #include <camera/camera_api.h>
 
@@ -55,11 +63,6 @@ typedef struct
     int fd;
 
     /**
-     * Callback to receive the encoded data for writing.
-     */
-    void (*write_callback)(const uint8_t *buf, ssize_t size);
-
-    /**
      * For internal use. Do not use.
      */
     void *reserved;
@@ -69,7 +72,7 @@ typedef struct
  * Create a default codec for encoding.
  *
  * Example:
- * AVCodecContext *codec_context = NULL:
+ * AVCodecContext *codec_context = NULL;
  * ffcamera_error err = ffcamera_default_codec(CODEC_ID_MPEG2VIDEO,
  *                                             288, 512,
  *                                             &codec_context);
@@ -92,6 +95,14 @@ ffcamera_error ffcamera_default_codec(enum CodecID codec_id,
  * ffcamera_init(&ffc_context);
  */
 void ffcamera_init(ffcamera_context *ffc_context);
+
+ffcamera_error ffcamera_set_close_callback(ffcamera_context *ffc_context,
+        void (*close_callback)(ffcamera_context *ffc_context, void *arg),
+        void *arg);
+
+ffcamera_error ffcamera_set_write_callback(ffcamera_context *ffc_context,
+        void (*write_callback)(ffcamera_context *ffc_context, const uint8_t *buf, ssize_t size, void *arg),
+        void *arg);
 
 /**
  * Close the context.
