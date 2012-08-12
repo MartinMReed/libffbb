@@ -35,18 +35,13 @@ void* encoding_thread(void* arg);
 
 void ffcamera_init(ffcamera_context *ffc_context)
 {
-    ffc_context->codec_context = NULL;
-    ffc_context->fd = 0;
+    ffcamera_reserved *ffc_reserved = (ffcamera_reserved*) ffc_context->reserved;
+    if (!ffc_reserved) ffc_reserved = (ffcamera_reserved*) malloc(sizeof(ffcamera_reserved));
+    memset(ffc_reserved, 0, sizeof(ffcamera_reserved));
 
-    ffcamera_reserved *ffc_reserved = (ffcamera_reserved*) malloc(sizeof(ffcamera_reserved));
+    memset(ffc_context, 0, sizeof(ffcamera_context));
+
     ffc_context->reserved = ffc_reserved;
-    ffc_reserved->frame_count = 0;
-    ffc_reserved->running = true;
-    ffc_reserved->frames.clear();
-    ffc_reserved->write_callback = NULL;
-    ffc_reserved->write_callback_arg = NULL;
-    ffc_reserved->close_callback = NULL;
-    ffc_reserved->close_callback_arg = NULL;
 
     pthread_mutex_init(&ffc_reserved->reading_mutex, 0);
     pthread_cond_init(&ffc_reserved->read_cond, 0);
@@ -122,6 +117,9 @@ ffcamera_error ffcamera_close(ffcamera_context *ffc_context)
     ffcamera_reserved *ffc_reserved = (ffcamera_reserved*) ffc_context->reserved;
     pthread_mutex_destroy(&ffc_reserved->reading_mutex);
     pthread_cond_destroy(&ffc_reserved->read_cond);
+    free(ffc_reserved);
+    ffc_reserved = (ffcamera_reserved*) NULL;
+    ffc_context->reserved = NULL;
 
     return FFCAMERA_OK;
 }
@@ -134,11 +132,11 @@ ffcamera_error ffcamera_start(ffcamera_context *ffc_context)
     if (!ffc_context->codec_context) return FFCAMERA_NO_CODEC_SPECIFIED;
 
     ffc_reserved->frame_count = 0;
+    ffc_reserved->running = true;
+    ffc_reserved->frames.clear();
 
     pthread_t pthread;
     pthread_create(&pthread, 0, &encoding_thread, ffc_context);
-
-    ffc_reserved->running = true;
 
     return FFCAMERA_OK;
 }
@@ -147,9 +145,10 @@ ffcamera_error ffcamera_stop(ffcamera_context *ffc_context)
 {
     ffcamera_reserved *ffc_reserved = (ffcamera_reserved*) ffc_context->reserved;
     if (!ffc_reserved) return FFCAMERA_NOT_INITIALIZED;
-    if (ffc_reserved->running) return FFCAMERA_ALREADY_STOPPED;
+    if (!ffc_reserved->running) return FFCAMERA_ALREADY_STOPPED;
 
     ffc_reserved->running = false;
+
     pthread_cond_signal(&ffc_reserved->read_cond);
 
     return FFCAMERA_OK;
@@ -173,10 +172,6 @@ void* encoding_thread(void* arg)
     ffcamera_context* ffc_context = (ffcamera_context*) arg;
     ffcamera_reserved *ffc_reserved = (ffcamera_reserved*) ffc_context->reserved;
 
-    int fd = ffc_context->fd;
-    AVCodecContext *codec_context = ffc_context->codec_context;
-    std::deque<camera_buffer_t*> frames = ffc_reserved->frames;
-
     int encode_buffer_len = 10000000;
     uint8_t *encode_buffer = (uint8_t *) av_malloc(encode_buffer_len);
 
@@ -186,9 +181,9 @@ void* encoding_thread(void* arg)
     int got_packet;
     int success;
 
-    while (ffc_reserved->running || !frames.empty())
+    while (ffc_reserved->running || !ffc_reserved->frames.empty())
     {
-        if (frames.empty())
+        if (ffc_reserved->frames.empty())
         {
             pthread_mutex_lock(&ffc_reserved->reading_mutex);
             pthread_cond_wait(&ffc_reserved->read_cond, &ffc_reserved->reading_mutex);
@@ -196,8 +191,8 @@ void* encoding_thread(void* arg)
             continue;
         }
 
-        camera_buffer_t *buf = frames.front();
-        frames.pop_front();
+        camera_buffer_t *buf = ffc_reserved->frames.front();
+        ffc_reserved->frames.pop_front();
 
         int frame_position = ffc_reserved->frame_count++;
 
@@ -221,11 +216,11 @@ void* encoding_thread(void* arg)
         packet.size = encode_buffer_len;
 
         got_packet = 0;
-        success = avcodec_encode_video2(codec_context, &packet, frame, &got_packet);
+        success = avcodec_encode_video2(ffc_context->codec_context, &packet, frame, &got_packet);
 
         if (success == 0 && got_packet > 0)
         {
-            if (!ffc_reserved->write_callback) write_all(fd, packet.data, packet.size);
+            if (!ffc_reserved->write_callback) write_all(ffc_context->fd, packet.data, packet.size);
             else ffc_reserved->write_callback(ffc_context, packet.data, packet.size,
                     ffc_reserved->write_callback_arg);
         }
@@ -248,11 +243,11 @@ void* encoding_thread(void* arg)
         packet.size = encode_buffer_len;
 
         got_packet = 0;
-        success = avcodec_encode_video2(codec_context, &packet, NULL, &got_packet);
+        success = avcodec_encode_video2(ffc_context->codec_context, &packet, NULL, &got_packet);
 
         if (success == 0 && got_packet > 0)
         {
-            if (!ffc_reserved->write_callback) write_all(fd, packet.data, packet.size);
+            if (!ffc_reserved->write_callback) write_all(ffc_context->fd, packet.data, packet.size);
             else ffc_reserved->write_callback(ffc_context, packet.data, packet.size,
                     ffc_reserved->write_callback_arg);
         }
