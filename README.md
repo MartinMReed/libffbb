@@ -3,11 +3,11 @@ Camera API add-on with FFmpeg support.
 Support forum post:  
 http://supportforums.blackberry.com/t5/Native-Development/Camera-API-NV12-frame-to-AVFrame-FFmpeg/td-p/1842089
 
-# Requirement
+# FFmpeg Requirement
 
 FFmpeg is a required library for libffcamapi. FFmpeg carries the LGPL-v2.1 license, unless H.264 is enabled, in which case it uses GPL.
 
-Included with libffcamapi is the FFmpeg source and prebuilt library files using the LGPL-v2.1 license. Listed below are some quick instructions for rebuilding FFmpeg for both armle-v7 and x86.
+Included with libffcamapi is the FFmpeg source and prebuilt library files. Listed below are some quick instructions for rebuilding FFmpeg for both armle-v7 and x86.
 
 ## Download FFmpeg
 
@@ -21,12 +21,14 @@ Visit the website at: [http://ffmpeg.org](http://ffmpeg.org)
 ## Building FFmpeg
 
 	$ # build (shared) libs for armle-v7
+	$ # to enable h.264 support add `--enable-gpl --enable-libx264 --extra-cflags=-I/workspace/libffcamapi/libx264/include --extra-ldflags=-L/workspace/libffcamapi/libx264/lib/armle-v7`
 	$ ./configure --enable-cross-compile --cross-prefix=arm-unknown-nto-qnx8.0.0eabi- --arch=armv7 --disable-debug --enable-optimizations --enable-asm --disable-static --enable-shared --target-os=qnx --disable-ffplay --disable-ffserver --disable-ffprobe --prefix=`pwd`/target  
-	$ make install 
+	$ make install
 
-	$ # build (static) libs for x86 (this config won't work)
+	$ # build (static) libs for x86
+	$ # to enable h.264 support add `--enable-gpl --enable-libx264 --extra-cflags=-I/workspace/libffcamapi/libx264/include --extra-ldflags=-L/workspace/libffcamapi/libx264/lib/x86`
 	$ ./configure --enable-cross-compile --cross-prefix=i486-pc-nto-qnx8.0.0- --arch=x86 --disable-debug --enable-static --disable-shared --target-os=qnx --disable-ffplay --disable-ffserver --disable-ffprobe --disable-yasm --prefix=`pwd`/target  
-	$ make install   
+	$ make install
 
 ## Compiling against FFmpeg
 
@@ -40,19 +42,50 @@ Visit the website at: [http://ffmpeg.org](http://ffmpeg.org)
 	}
 	
 	INCLUDEPATH += ../ffmpeg/include
-	LIBS += -lcamapi -L../ffmpeg/lib/$${ARCH} -lavformat -lavcodec -lavutil
+	LIBS += -lcamapi -L../ffmpeg/lib/{gpl|lgpl}/$${ARCH} -lavformat -lavcodec -lavutil
 
 ## Including FFmpeg in the BAR
 
 	<!-- include libs for armle-v7 -->
-	<asset path="ffmpeg/lib/armle-v7/libavcodec.so.54">lib/libavcodec.so.54</asset>
-	<asset path="ffmpeg/lib/armle-v7/libavformat.so.54">lib/libavformat.so.54</asset>
-	<asset path="ffmpeg/lib/armle-v7/libavutil.so.51">lib/libavutil.so.51</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/armle-v7/libavcodec.so.54">lib/libavcodec.so.54</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/armle-v7/libavformat.so.54">lib/libavformat.so.54</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/armle-v7/libavutil.so.51">lib/libavutil.so.51</asset>
 	
 	<!-- include libs for x86 -->
-	<asset path="ffmpeg/lib/x86/libavcodec.a">lib/libavcodec.a</asset>
-	<asset path="ffmpeg/lib/x86/libavformat.a">lib/libavformat.a</asset>
-	<asset path="ffmpeg/lib/x86/libavutil.a">lib/libavutil.a</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/x86/libavcodec.a">lib/libavcodec.a</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/x86/libavformat.a">lib/libavformat.a</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/x86/libavutil.a">lib/libavutil.a</asset>
+
+# H.264 Optional Support
+
+FFmpeg supports h.264 using the GPL library libx264. Included with libffcamapi is the libx264 source and prebuilt library files.
+
+## Download libx264
+
+Visit the website at: [http://www.videolan.org](http://www.videolan.org/developers/x264.html)
+
+## Building libx264
+
+	$ # build (shared) libs for armle-v7
+	$ ./configure --cross-prefix=arm-unknown-nto-qnx8.0.0eabi- --enable-shared --host=arm-linux --disable-cli --prefix=`pwd`/target
+	$ make install
+
+	$ # build (static) libs for x86
+	$ ./configure --cross-prefix=i486-pc-nto-qnx8.0.0- --enable-static --host=x86-linux --disable-asm --disable-cli --prefix=`pwd`/target
+	$ make install
+
+## Compiling against libx264
+
+	INCLUDEPATH += ../libx264/include
+	LIBS += -L../libx264/lib/$${ARCH} -lx264
+
+## Including libx264 in the BAR
+
+	<!-- include libs for armle-v7 -->
+	<asset path="libx264/lib/armle-v7/libx264.so.125">lib/libx264.so.125</asset>
+	
+	<!-- include libs for x86 -->
+	<asset path="libx264/lib/x86/libx264.a">lib/libx264.a</asset>
 
 # License
 
