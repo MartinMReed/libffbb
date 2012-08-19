@@ -40,7 +40,6 @@ void ffcamera_init(ffcamera_context *ffc_context)
     memset(ffc_reserved, 0, sizeof(ffcamera_reserved));
 
     memset(ffc_context, 0, sizeof(ffcamera_context));
-
     ffc_context->reserved = ffc_reserved;
 
     pthread_mutex_init(&ffc_reserved->reading_mutex, 0);
@@ -69,58 +68,33 @@ ffcamera_error ffcamera_set_write_callback(ffcamera_context *ffc_context,
     return FFCAMERA_OK;
 }
 
-ffcamera_error ffcamera_default_codec(enum CodecID codec_id,
-        int width, int height, AVCodecContext **codec_context)
-{
-    if (width <= 0 || height <= 0) return FFCAMERA_INVALID_DIMENSIONS;
-
-    AVCodec *codec = avcodec_find_encoder(codec_id);
-
-    if (!codec)
-    {
-        av_register_all();
-        codec = avcodec_find_encoder(codec_id);
-        if (!codec) return FFCAMERA_CODEC_NOT_FOUND;
-    }
-
-    AVCodecContext *_codec_context = avcodec_alloc_context3(codec);
-    _codec_context->pix_fmt = PIX_FMT_YUV420P;
-    _codec_context->width = width;
-    _codec_context->height = height;
-    _codec_context->bit_rate = 400000;
-    _codec_context->time_base.num = 1;
-    _codec_context->time_base.den = 30;
-    _codec_context->ticks_per_frame = 2;
-    _codec_context->gop_size = 15;
-    _codec_context->colorspace = AVCOL_SPC_SMPTE170M;
-    _codec_context->thread_count = 2;
-
-    int codec_open = avcodec_open2(_codec_context, codec, NULL);
-    if (codec_open < 0) return FFCAMERA_COULD_NOT_OPEN_CODEC;
-
-    *codec_context = _codec_context;
-
-    return FFCAMERA_OK;
-}
-
 ffcamera_error ffcamera_close(ffcamera_context *ffc_context)
 {
     AVCodecContext *codec_context = ffc_context->codec_context;
 
     if (codec_context)
     {
-        avcodec_close(codec_context);
+        if (avcodec_is_open(codec_context))
+        {
+            avcodec_close(codec_context);
+        }
+
         av_free(codec_context);
         codec_context = ffc_context->codec_context = NULL;
     }
 
+    return FFCAMERA_OK;
+}
+
+ffcamera_error ffcamera_free(ffcamera_context *ffc_context)
+{
     ffcamera_reserved *ffc_reserved = (ffcamera_reserved*) ffc_context->reserved;
     pthread_mutex_destroy(&ffc_reserved->reading_mutex);
     pthread_cond_destroy(&ffc_reserved->read_cond);
     free(ffc_reserved);
     ffc_reserved = (ffcamera_reserved*) NULL;
     ffc_context->reserved = NULL;
-
+    free(ffc_context);
     return FFCAMERA_OK;
 }
 

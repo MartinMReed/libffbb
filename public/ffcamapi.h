@@ -38,9 +38,6 @@ typedef enum
     FFCAMERA_OK = 0,
     FFCAMERA_NOT_INITIALIZED,
     FFCAMERA_NO_CODEC_SPECIFIED,
-    FFCAMERA_CODEC_NOT_FOUND,
-    FFCAMERA_COULD_NOT_OPEN_CODEC,
-    FFCAMERA_INVALID_DIMENSIONS,
     FFCAMERA_ALREADY_RUNNING,
     FFCAMERA_ALREADY_STOPPED
 } ffcamera_error;
@@ -69,25 +66,6 @@ typedef struct
 } ffcamera_context;
 
 /**
- * Create a default codec for encoding.
- *
- * Example:
- * AVCodecContext *codec_context = NULL;
- * ffcamera_error err = ffcamera_default_codec(CODEC_ID_MPEG2VIDEO,
- *                                             288, 512,
- *                                             &codec_context);
- *
- * codec_id: Codec to use for encoding. Matches one of CODEC_ID_*
- * width: The width of the encoded video
- * height: The height of the encoded video
- * codec_context: The output codec context
- *
- * returns FFCAMERA_OK on success
- */
-ffcamera_error ffcamera_default_codec(enum CodecID codec_id,
-        int width, int height, AVCodecContext **codec_context);
-
-/**
  * Initialize the context with default values.
  *
  * Example:
@@ -106,9 +84,14 @@ ffcamera_error ffcamera_set_write_callback(ffcamera_context *ffc_context,
 
 /**
  * Close the context.
- * This will also close the AVCodecContext.
+ * This will also close the AVCodecContext if not already closed.
  */
 ffcamera_error ffcamera_close(ffcamera_context *ffc_context);
+
+/**
+ * Free the context.
+ */
+ffcamera_error ffcamera_free(ffcamera_context *ffc_context);
 
 /**
  * Start recording and encoding the camera frames.
