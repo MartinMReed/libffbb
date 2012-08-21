@@ -7,11 +7,11 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.qnx.qcc.configuration.sharedLib.debug.1939463233" moduleId="org.eclipse.cdt.core.settings" name="Device-Debug">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi/public"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffcamapi/Device-Debug"/>
-						<entry flags="" kind="libraryFile" name="libffcamapi"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="libffcamapi"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb/public"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffbb/Device-Debug"/>
+						<entry flags="" kind="libraryFile" name="libffbb"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="libffbb"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -27,7 +27,7 @@
 						<toolChain id="com.qnx.qcc.toolChain.sharedLib.debug.1395393361" name="QNX QCC" superClass="com.qnx.qcc.toolChain">
 							<option id="com.qnx.qcc.option.cpu.1471257207" name="Target CPU:" superClass="com.qnx.qcc.option.cpu" value="com.qnx.qcc.option.gen.cpu.armle-v7" valueType="enumerated"/>
 							<targetPlatform archList="all" binaryParser="com.qnx.tools.ide.qde.core.QDEBynaryParser" id="com.qnx.qcc.targetPlatform.1260702436" osList="all" superClass="com.qnx.qcc.targetPlatform"/>
-							<builder buildPath="${workspace_loc:/libffcamapi/Device-Debug}" id="com.qnx.nto.171796255" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
+							<builder buildPath="${workspace_loc:/libffbb/Device-Debug}" id="com.qnx.nto.171796255" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
 							<tool id="com.qnx.qcc.tool.compiler.1845539715" name="QCC Compiler" superClass="com.qnx.qcc.tool.compiler">
 								<option id="com.qnx.qcc.option.compiler.shared.2078347357" name="Shared (-shared)" superClass="com.qnx.qcc.option.compiler.shared" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.optlevel.772898908" name="Optimization Level" superClass="com.qnx.qcc.option.compiler.optlevel" value="com.qnx.qcc.option.compiler.optlevel.0" valueType="enumerated"/>
@@ -36,6 +36,8 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/public}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/ffmpeg/include}"/>
 									<listOptionValue builtIn="false" value="${QNX_TARGET}/../target-override/usr/include"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4/QtCore&quot;"/>
 								</option>
 								<option id="com.qnx.qcc.option.compiler.security.136450326" name="Enhanced Security (-fstack-protector-all)" superClass="com.qnx.qcc.option.compiler.security" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.defines.408441153" name="Defines (-D)" superClass="com.qnx.qcc.option.compiler.defines" valueType="definedSymbols">
@@ -79,11 +81,11 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.qnx.qcc.configuration.sharedLib.release.1583940039" moduleId="org.eclipse.cdt.core.settings" name="Device-Release">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi/public"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffcamapi/Device-Release"/>
-						<entry flags="" kind="libraryFile" name="libffcamapi"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="libffcamapi"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb/public"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffbb/Device-Release"/>
+						<entry flags="" kind="libraryFile" name="libffbb"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="libffbb"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -99,7 +101,7 @@
 						<toolChain id="com.qnx.qcc.toolChain.sharedLib.release.1676838647" name="QNX QCC" superClass="com.qnx.qcc.toolChain">
 							<option id="com.qnx.qcc.option.cpu.2101991950" name="Target CPU:" superClass="com.qnx.qcc.option.cpu" value="com.qnx.qcc.option.gen.cpu.armle-v7" valueType="enumerated"/>
 							<targetPlatform archList="all" binaryParser="com.qnx.tools.ide.qde.core.QDEBynaryParser" id="com.qnx.qcc.targetPlatform.389308563" osList="all" superClass="com.qnx.qcc.targetPlatform"/>
-							<builder buildPath="${workspace_loc:/libffcamapi/Device-Release}" id="com.qnx.nto.2008124398" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
+							<builder buildPath="${workspace_loc:/libffbb/Device-Release}" id="com.qnx.nto.2008124398" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
 							<tool id="com.qnx.qcc.tool.compiler.393726477" name="QCC Compiler" superClass="com.qnx.qcc.tool.compiler">
 								<option id="com.qnx.qcc.option.compiler.shared.1641753102" name="Shared (-shared)" superClass="com.qnx.qcc.option.compiler.shared" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.optlevel.533214413" name="Optimization Level" superClass="com.qnx.qcc.option.compiler.optlevel" value="com.qnx.qcc.option.compiler.optlevel.2" valueType="enumerated"/>
@@ -107,6 +109,8 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/public}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/ffmpeg/include}"/>
 									<listOptionValue builtIn="false" value="${QNX_TARGET}/../target-override/usr/include"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4/QtCore&quot;"/>
 								</option>
 								<option id="com.qnx.qcc.option.compiler.security.1892419139" name="Enhanced Security (-fstack-protector-all)" superClass="com.qnx.qcc.option.compiler.security" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.defines.1489625439" name="Defines (-D)" superClass="com.qnx.qcc.option.compiler.defines" valueType="definedSymbols">
@@ -151,11 +155,11 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.qnx.qcc.configuration.sharedLib.profile.1556109694" moduleId="org.eclipse.cdt.core.settings" name="Device-Profile">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi/public"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffcamapi/Device-Profile"/>
-						<entry flags="" kind="libraryFile" name="libffcamapi"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="libffcamapi"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb/public"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffbb/Device-Profile"/>
+						<entry flags="" kind="libraryFile" name="libffbb"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="libffbb"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -171,7 +175,7 @@
 						<toolChain id="com.qnx.qcc.toolChain.sharedLib.profile.1419045047" name="QNX QCC" superClass="com.qnx.qcc.toolChain">
 							<option id="com.qnx.qcc.option.cpu.255829734" name="Target CPU:" superClass="com.qnx.qcc.option.cpu" value="com.qnx.qcc.option.gen.cpu.armle-v7" valueType="enumerated"/>
 							<targetPlatform archList="all" binaryParser="com.qnx.tools.ide.qde.core.QDEBynaryParser" id="com.qnx.qcc.targetPlatform.634223881" osList="all" superClass="com.qnx.qcc.targetPlatform"/>
-							<builder buildPath="${workspace_loc:/libffcamapi/Device-Profile}" id="com.qnx.nto.1276906004" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
+							<builder buildPath="${workspace_loc:/libffbb/Device-Profile}" id="com.qnx.nto.1276906004" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
 							<tool id="com.qnx.qcc.tool.compiler.553805026" name="QCC Compiler" superClass="com.qnx.qcc.tool.compiler">
 								<option id="com.qnx.qcc.option.compiler.shared.1339748628" name="Shared (-shared)" superClass="com.qnx.qcc.option.compiler.shared" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.optlevel.1003024899" name="Optimization Level" superClass="com.qnx.qcc.option.compiler.optlevel" value="com.qnx.qcc.option.compiler.optlevel.0" valueType="enumerated"/>
@@ -181,6 +185,8 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/public}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/ffmpeg/include}"/>
 									<listOptionValue builtIn="false" value="${QNX_TARGET}/../target-override/usr/include"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4/QtCore&quot;"/>
 								</option>
 								<option id="com.qnx.qcc.option.compiler.security.801990527" name="Enhanced Security (-fstack-protector-all)" superClass="com.qnx.qcc.option.compiler.security" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.defines.1434556627" name="Defines (-D)" superClass="com.qnx.qcc.option.compiler.defines" valueType="definedSymbols">
@@ -225,11 +231,11 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.qnx.qcc.configuration.sharedLib.coverage.733211744" moduleId="org.eclipse.cdt.core.settings" name="Device-Coverage">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi/public"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffcamapi/Device-Coverage"/>
-						<entry flags="" kind="libraryFile" name="libffcamapi"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="libffcamapi"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb/public"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffbb/Device-Coverage"/>
+						<entry flags="" kind="libraryFile" name="libffbb"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="libffbb"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -245,7 +251,7 @@
 						<toolChain id="com.qnx.qcc.toolChain.sharedLib.coverage.1519357608" name="QNX QCC" superClass="com.qnx.qcc.toolChain">
 							<option id="com.qnx.qcc.option.cpu.1431859003" name="Target CPU:" superClass="com.qnx.qcc.option.cpu" value="com.qnx.qcc.option.gen.cpu.armle-v7" valueType="enumerated"/>
 							<targetPlatform archList="all" binaryParser="com.qnx.tools.ide.qde.core.QDEBynaryParser" id="com.qnx.qcc.targetPlatform.853663018" osList="all" superClass="com.qnx.qcc.targetPlatform"/>
-							<builder buildPath="${workspace_loc:/libffcamapi/Device-Coverage}" id="com.qnx.nto.1647759457" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
+							<builder buildPath="${workspace_loc:/libffbb/Device-Coverage}" id="com.qnx.nto.1647759457" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
 							<tool id="com.qnx.qcc.tool.compiler.1264792494" name="QCC Compiler" superClass="com.qnx.qcc.tool.compiler">
 								<option id="com.qnx.qcc.option.compiler.shared.1136172088" name="Shared (-shared)" superClass="com.qnx.qcc.option.compiler.shared" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.optlevel.3033721" name="Optimization Level" superClass="com.qnx.qcc.option.compiler.optlevel" value="com.qnx.qcc.option.compiler.optlevel.0" valueType="enumerated"/>
@@ -255,6 +261,8 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/public}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/ffmpeg/include}"/>
 									<listOptionValue builtIn="false" value="${QNX_TARGET}/../target-override/usr/include"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4/QtCore&quot;"/>
 								</option>
 								<option id="com.qnx.qcc.option.compiler.security.90009596" name="Enhanced Security (-fstack-protector-all)" superClass="com.qnx.qcc.option.compiler.security" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.defines.1564481271" name="Defines (-D)" superClass="com.qnx.qcc.option.compiler.defines" valueType="definedSymbols">
@@ -299,11 +307,11 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.qnx.qcc.configuration.sharedLib.debug.955879438" moduleId="org.eclipse.cdt.core.settings" name="Simulator-Debug">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi/public"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffcamapi/Simulator-Debug"/>
-						<entry flags="" kind="libraryFile" name="libffcamapi"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="libffcamapi"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb/public"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffbb/Simulator-Debug"/>
+						<entry flags="" kind="libraryFile" name="libffbb"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="libffbb"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -318,7 +326,7 @@
 					<folderInfo id="com.qnx.qcc.configuration.sharedLib.debug.955879438." name="/" resourcePath="">
 						<toolChain id="com.qnx.qcc.toolChain.sharedLib.debug.300203137" name="QNX QCC" superClass="com.qnx.qcc.toolChain">
 							<targetPlatform archList="all" binaryParser="com.qnx.tools.ide.qde.core.QDEBynaryParser" id="com.qnx.qcc.targetPlatform.1987186982" osList="all" superClass="com.qnx.qcc.targetPlatform"/>
-							<builder buildPath="${workspace_loc:/libffcamapi/Simulator-Debug}" id="com.qnx.nto.643215391" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
+							<builder buildPath="${workspace_loc:/libffbb/Simulator-Debug}" id="com.qnx.nto.643215391" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
 							<tool id="com.qnx.qcc.tool.compiler.1268527816" name="QCC Compiler" superClass="com.qnx.qcc.tool.compiler">
 								<option id="com.qnx.qcc.option.compiler.shared.1751438526" name="Shared (-shared)" superClass="com.qnx.qcc.option.compiler.shared" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.optlevel.209042795" name="Optimization Level" superClass="com.qnx.qcc.option.compiler.optlevel" value="com.qnx.qcc.option.compiler.optlevel.0" valueType="enumerated"/>
@@ -327,6 +335,8 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/public}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/ffmpeg/include}"/>
 									<listOptionValue builtIn="false" value="${QNX_TARGET}/../target-override/usr/include"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4/QtCore&quot;"/>
 								</option>
 								<option id="com.qnx.qcc.option.compiler.security.993318883" name="Enhanced Security (-fstack-protector-all)" superClass="com.qnx.qcc.option.compiler.security" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.defines.389805594" name="Defines (-D)" superClass="com.qnx.qcc.option.compiler.defines" valueType="definedSymbols">
@@ -370,11 +380,11 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.qnx.qcc.configuration.sharedLib.profile.1776001785" moduleId="org.eclipse.cdt.core.settings" name="Simulator-Profile">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi/public"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffcamapi/Simulator-Profile"/>
-						<entry flags="" kind="libraryFile" name="libffcamapi"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="libffcamapi"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb/public"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffbb/Simulator-Profile"/>
+						<entry flags="" kind="libraryFile" name="libffbb"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="libffbb"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -389,7 +399,7 @@
 					<folderInfo id="com.qnx.qcc.configuration.sharedLib.profile.1776001785." name="/" resourcePath="">
 						<toolChain id="com.qnx.qcc.toolChain.sharedLib.profile.1694557496" name="QNX QCC" superClass="com.qnx.qcc.toolChain">
 							<targetPlatform archList="all" binaryParser="com.qnx.tools.ide.qde.core.QDEBynaryParser" id="com.qnx.qcc.targetPlatform.882050443" osList="all" superClass="com.qnx.qcc.targetPlatform"/>
-							<builder buildPath="${workspace_loc:/libffcamapi/Simulator-Profile}" id="com.qnx.nto.1047564772" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
+							<builder buildPath="${workspace_loc:/libffbb/Simulator-Profile}" id="com.qnx.nto.1047564772" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
 							<tool id="com.qnx.qcc.tool.compiler.1653279677" name="QCC Compiler" superClass="com.qnx.qcc.tool.compiler">
 								<option id="com.qnx.qcc.option.compiler.shared.381988355" name="Shared (-shared)" superClass="com.qnx.qcc.option.compiler.shared" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.optlevel.576986275" name="Optimization Level" superClass="com.qnx.qcc.option.compiler.optlevel" value="com.qnx.qcc.option.compiler.optlevel.0" valueType="enumerated"/>
@@ -399,6 +409,8 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/public}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/ffmpeg/include}"/>
 									<listOptionValue builtIn="false" value="${QNX_TARGET}/../target-override/usr/include"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4/QtCore&quot;"/>
 								</option>
 								<option id="com.qnx.qcc.option.compiler.security.1254815709" name="Enhanced Security (-fstack-protector-all)" superClass="com.qnx.qcc.option.compiler.security" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.defines.2031911429" name="Defines (-D)" superClass="com.qnx.qcc.option.compiler.defines" valueType="definedSymbols">
@@ -443,11 +455,11 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.qnx.qcc.configuration.sharedLib.coverage.1731990829" moduleId="org.eclipse.cdt.core.settings" name="Simulator-Coverage">
 				<externalSettings>
 					<externalSetting>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi/public"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffcamapi"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffcamapi/Simulator-Coverage"/>
-						<entry flags="" kind="libraryFile" name="libffcamapi"/>
-						<entry flags="RESOLVED" kind="libraryFile" name="libffcamapi"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb/public"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/libffbb"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/libffbb/Simulator-Coverage"/>
+						<entry flags="" kind="libraryFile" name="libffbb"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="libffbb"/>
 					</externalSetting>
 				</externalSettings>
 				<extensions>
@@ -462,7 +474,7 @@
 					<folderInfo id="com.qnx.qcc.configuration.sharedLib.coverage.1731990829." name="/" resourcePath="">
 						<toolChain id="com.qnx.qcc.toolChain.sharedLib.coverage.444906406" name="QNX QCC" superClass="com.qnx.qcc.toolChain">
 							<targetPlatform archList="all" binaryParser="com.qnx.tools.ide.qde.core.QDEBynaryParser" id="com.qnx.qcc.targetPlatform.1128119847" osList="all" superClass="com.qnx.qcc.targetPlatform"/>
-							<builder buildPath="${workspace_loc:/libffcamapi/Simulator-Coverage}" id="com.qnx.nto.1704171560" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
+							<builder buildPath="${workspace_loc:/libffbb/Simulator-Coverage}" id="com.qnx.nto.1704171560" keepEnvironmentInBuildfile="false" name="CDT Internal Builder" superClass="com.qnx.nto"/>
 							<tool id="com.qnx.qcc.tool.compiler.1498753308" name="QCC Compiler" superClass="com.qnx.qcc.tool.compiler">
 								<option id="com.qnx.qcc.option.compiler.shared.1747316840" name="Shared (-shared)" superClass="com.qnx.qcc.option.compiler.shared" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.optlevel.1820985752" name="Optimization Level" superClass="com.qnx.qcc.option.compiler.optlevel" value="com.qnx.qcc.option.compiler.optlevel.0" valueType="enumerated"/>
@@ -472,6 +484,8 @@
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/public}"/>
 									<listOptionValue builtIn="false" value="${workspace_loc:/${ProjName}/ffmpeg/include}"/>
 									<listOptionValue builtIn="false" value="${QNX_TARGET}/../target-override/usr/include"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${QNX_TARGET}/usr/include/qt4/QtCore&quot;"/>
 								</option>
 								<option id="com.qnx.qcc.option.compiler.security.1975799802" name="Enhanced Security (-fstack-protector-all)" superClass="com.qnx.qcc.option.compiler.security" value="true" valueType="boolean"/>
 								<option id="com.qnx.qcc.option.compiler.defines.1851752491" name="Defines (-D)" superClass="com.qnx.qcc.option.compiler.defines" valueType="definedSymbols">
@@ -541,6 +555,6 @@
 		</scannerConfigBuildInfo>
 	</storageModule>
 	<storageModule moduleId="refreshScope" versionNumber="1">
-		<resource resourceType="PROJECT" workspacePath="/libffcamapi"/>
+		<resource resourceType="PROJECT" workspacePath="/libffbb"/>
 	</storageModule>
 </cproject>

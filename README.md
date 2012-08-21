@@ -5,9 +5,9 @@ http://supportforums.blackberry.com/t5/Native-Development/Camera-API-NV12-frame-
 
 # FFmpeg Requirement
 
-FFmpeg is a required library for libffcamapi. FFmpeg carries the LGPL-v2.1 license, unless H.264 is enabled, in which case it uses GPL.
+FFmpeg is a required library for libffbb. FFmpeg carries the LGPL-v2.1 license, unless H.264 is enabled, in which case it uses GPL.
 
-Included with libffcamapi is the FFmpeg source and prebuilt library files. Listed below are some quick instructions for rebuilding FFmpeg for both armle-v7 and x86.
+Included with libffbb is the FFmpeg source and prebuilt library files. Listed below are some quick instructions for rebuilding FFmpeg for both armle-v7 and x86.
 
 ## Download FFmpeg
 
@@ -21,12 +21,12 @@ Visit the website at: [http://ffmpeg.org](http://ffmpeg.org)
 ## Building FFmpeg
 
 	$ # build (shared) libs for armle-v7
-	$ # to enable h.264 support add `--enable-gpl --enable-libx264 --extra-cflags=-I/workspace/libffcamapi/libx264/include --extra-ldflags=-L/workspace/libffcamapi/libx264/lib/armle-v7`
+	$ # to enable h.264 support add `--enable-gpl --enable-libx264 --extra-cflags=-I/workspace/libffbb/libx264/include --extra-ldflags=-L/workspace/libffbb/libx264/lib/armle-v7`
 	$ ./configure --enable-cross-compile --cross-prefix=arm-unknown-nto-qnx8.0.0eabi- --arch=armv7 --disable-debug --enable-optimizations --enable-asm --disable-static --enable-shared --target-os=qnx --disable-ffplay --disable-ffserver --disable-ffprobe --prefix=`pwd`/target  
 	$ make install
 
 	$ # build (static) libs for x86
-	$ # to enable h.264 support add `--enable-gpl --enable-libx264 --extra-cflags=-I/workspace/libffcamapi/libx264/include --extra-ldflags=-L/workspace/libffcamapi/libx264/lib/x86`
+	$ # to enable h.264 support add `--enable-gpl --enable-libx264 --extra-cflags=-I/workspace/libffbb/libx264/include --extra-ldflags=-L/workspace/libffbb/libx264/lib/x86`
 	$ ./configure --enable-cross-compile --cross-prefix=i486-pc-nto-qnx8.0.0- --arch=x86 --disable-debug --enable-static --disable-shared --target-os=qnx --disable-ffplay --disable-ffserver --disable-ffprobe --disable-yasm --prefix=`pwd`/target  
 	$ make install
 
@@ -58,7 +58,7 @@ Visit the website at: [http://ffmpeg.org](http://ffmpeg.org)
 
 # H.264 Optional Support
 
-FFmpeg supports h.264 using the GPL library libx264. Included with libffcamapi is the libx264 source and prebuilt library files.
+FFmpeg supports h.264 using the GPL library libx264. Included with libffbb is the libx264 source and prebuilt library files.
 
 ## Download libx264
 
@@ -89,4 +89,4 @@ Visit the website at: [http://www.videolan.org](http://www.videolan.org/develope
 
 # License
 
-While FFmpeg is either LGPL-v2.1 or GPL depending on how it is built, libffcamapi uses Apache License, Version 2.0.
+While FFmpeg is either LGPL-v2.1 or GPL depending on how it is built, libffbb uses Apache License, Version 2.0.

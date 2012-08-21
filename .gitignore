@@ -4,3 +4,10 @@
 **/.DS_Store
 bin
 target
+Device-Coverage
+Device-Debug
+Device-Profile
+Device-Release
+Simulator-Coverage
+Simulator-Debug
+Simulator-Profile
