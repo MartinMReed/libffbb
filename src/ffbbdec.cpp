@@ -32,9 +32,8 @@ typedef struct
 {
     bool running;
     bool open;
-    int frame_count;
     ffdec_view *view;
-    void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, int i, void *arg);
+    void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, void *arg);
     void *frame_callback_arg;
     int (*read_callback)(ffdec_context *ffd_context, uint8_t *buf, ssize_t size, void *arg);
     void *read_callback_arg;
@@ -69,14 +68,14 @@ void ffdec_reset(ffdec_context *ffd_context)
     ffd_context->reserved = ffd_reserved;
 }
 
-ffdec_error ffdec_set_close_callback(ffdec_context *ffd_context,
-        void (*close_callback)(ffdec_context *ffd_context, void *arg),
+ffdec_error ffdec_set_frame_callback(ffdec_context *ffd_context,
+        void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, void *arg),
         void *arg)
 {
     ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
     if (!ffd_reserved) return FFDEC_NOT_INITIALIZED;
-    ffd_reserved->close_callback = close_callback;
-    ffd_reserved->close_callback_arg = arg;
+    ffd_reserved->frame_callback = frame_callback;
+    ffd_reserved->frame_callback_arg = arg;
     return FFDEC_OK;
 }
 
@@ -91,14 +90,14 @@ ffdec_error ffdec_set_read_callback(ffdec_context *ffd_context,
     return FFDEC_OK;
 }
 
-ffdec_error ffdec_set_frame_callback(ffdec_context *ffd_context,
-        void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, int i, void *arg),
+ffdec_error ffdec_set_close_callback(ffdec_context *ffd_context,
+        void (*close_callback)(ffdec_context *ffd_context, void *arg),
         void *arg)
 {
     ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
     if (!ffd_reserved) return FFDEC_NOT_INITIALIZED;
-    ffd_reserved->frame_callback = frame_callback;
-    ffd_reserved->frame_callback_arg = arg;
+    ffd_reserved->close_callback = close_callback;
+    ffd_reserved->close_callback_arg = arg;
     return FFDEC_OK;
 }
 
@@ -145,7 +144,6 @@ ffdec_error ffdec_start(ffdec_context *ffd_context)
     if (ffd_reserved->running) return FFDEC_ALREADY_RUNNING;
     if (!ffd_context->codec_context) return FFDEC_NO_CODEC_SPECIFIED;
 
-    ffd_reserved->frame_count = 0;
     ffd_reserved->running = true;
 
     pthread_t pthread;
@@ -199,19 +197,17 @@ void* decoding_thread(void* arg)
 
             if (decode_result < 0)
             {
-                fprintf(stderr, "Error while decoding frame %d\n", ffd_reserved->frame_count);
-                exit(1);
+                fprintf(stderr, "Error while decoding video\n");
+                ffd_reserved->running = false;
+                break;
             }
 
             if (got_frame)
             {
                 if (ffd_reserved->frame_callback) ffd_reserved->frame_callback(
-                        ffd_context, frame, ffd_reserved->frame_count,
-                        ffd_reserved->frame_callback_arg);
+                        ffd_context, frame, ffd_reserved->frame_callback_arg);
 
                 display_frame(ffd_context, frame);
-
-                ffd_reserved->frame_count++;
             }
 
             packet.size -= decode_result;
@@ -232,12 +228,9 @@ void* decoding_thread(void* arg)
         if (got_frame)
         {
             if (ffd_reserved->frame_callback) ffd_reserved->frame_callback(
-                    ffd_context, frame, ffd_reserved->frame_count,
-                    ffd_reserved->frame_callback_arg);
+                    ffd_context, frame, ffd_reserved->frame_callback_arg);
 
             display_frame(ffd_context, frame);
-
-            ffd_reserved->frame_count++;
         }
     }
 

@@ -26,6 +26,8 @@ typedef struct
     pthread_mutex_t reading_mutex;
     pthread_cond_t read_cond;
     std::deque<AVFrame*> frames;
+    void (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, void *arg);
+    void *frame_callback_arg;
     void (*write_callback)(ffenc_context *ffe_context, uint8_t *buf, ssize_t size, void *arg);
     void *write_callback_arg;
     void (*close_callback)(ffenc_context *ffe_context, void *arg);
@@ -58,14 +60,14 @@ void ffenc_reset(ffenc_context *ffe_context)
     ffe_context->reserved = ffe_reserved;
 }
 
-ffenc_error ffenc_set_close_callback(ffenc_context *ffe_context,
-        void (*close_callback)(ffenc_context *ffe_context, void *arg),
+ffenc_error ffenc_set_frame_callback(ffenc_context *ffe_context,
+        void (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, void *arg),
         void *arg)
 {
     ffenc_reserved *ffe_reserved = (ffenc_reserved*) ffe_context->reserved;
     if (!ffe_reserved) return FFENC_NOT_INITIALIZED;
-    ffe_reserved->close_callback = close_callback;
-    ffe_reserved->close_callback_arg = arg;
+    ffe_reserved->frame_callback = frame_callback;
+    ffe_reserved->frame_callback_arg = arg;
     return FFENC_OK;
 }
 
@@ -77,6 +79,17 @@ ffenc_error ffenc_set_write_callback(ffenc_context *ffe_context,
     if (!ffe_reserved) return FFENC_NOT_INITIALIZED;
     ffe_reserved->write_callback = write_callback;
     ffe_reserved->write_callback_arg = arg;
+    return FFENC_OK;
+}
+
+ffenc_error ffenc_set_close_callback(ffenc_context *ffe_context,
+        void (*close_callback)(ffenc_context *ffe_context, void *arg),
+        void *arg)
+{
+    ffenc_reserved *ffe_reserved = (ffenc_reserved*) ffe_context->reserved;
+    if (!ffe_reserved) return FFENC_NOT_INITIALIZED;
+    ffe_reserved->close_callback = close_callback;
+    ffe_reserved->close_callback_arg = arg;
     return FFENC_OK;
 }
 
@@ -164,6 +177,9 @@ void* encoding_thread(void* arg)
         AVFrame *frame = ffe_reserved->frames.front();
         ffe_reserved->frames.pop_front();
 
+        if (ffe_reserved->frame_callback) ffe_reserved->frame_callback(
+                ffe_context, frame, ffe_reserved->frame_callback_arg);
+
         // reset the AVPacket
         av_init_packet(&packet);
         packet.data = encode_buffer;
@@ -238,8 +254,6 @@ ffenc_error ffenc_add_frame(ffenc_context *ffe_context, camera_buffer_t* buf)
     int64_t _uv_offset = _stride * height;
 
     AVFrame *frame = avcodec_alloc_frame();
-
-    frame->pts = buf->frametimestamp;
 
     frame->linesize[0] = _stride;
     frame->linesize[1] = _stride / 2;
