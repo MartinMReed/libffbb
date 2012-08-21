@@ -185,7 +185,7 @@ void* decoding_thread(void* arg)
         if (ffd_reserved->read_callback) packet.size = ffd_reserved->read_callback(ffd_context,
                 decode_buffer, decode_buffer_length, ffd_reserved->read_callback_arg);
 
-        if (!packet.size) break;
+        if (packet.size <= 0) break;
 
         packet.data = decode_buffer;
 
