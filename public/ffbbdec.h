@@ -46,7 +46,7 @@ typedef enum
 typedef struct
 {
     /**
-     * The codec context to use for encoding.
+     * The codec context to use for decoding.
      */
     AVCodecContext *codec_context;
 
@@ -90,14 +90,13 @@ ffdec_error ffdec_close(ffdec_context *ffd_context);
 ffdec_error ffdec_free(ffdec_context *ffd_context);
 
 /**
- * Start recording and encoding the camera frames.
- * Encoding will begin on a background thread.
+ * Start decoding the camera frames.
+ * Decoding will begin on a background thread.
  */
 ffdec_error ffdec_start(ffdec_context *ffd_context);
 
 /**
- * Stop recording frames. Once all recorded frames have been encoded
- * the background thread will die.
+ * Stop decoding frames and kill the background thread.
  */
 ffdec_error ffdec_stop(ffdec_context *ffd_context);
 
