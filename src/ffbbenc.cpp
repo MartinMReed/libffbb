@@ -237,6 +237,7 @@ ffenc_error ffenc_add_frame(ffenc_context *ffe_context, AVFrame *frame)
     return FFENC_OK;
 }
 
+#ifndef OSX_PLATFORM
 ffenc_error ffenc_add_frame(ffenc_context *ffe_context, camera_buffer_t* buf)
 {
     if (buf->frametype != CAMERA_FRAMETYPE_NV12) return FFENC_FRAME_NOT_SUPPORTED;
@@ -291,4 +292,4 @@ ffenc_error ffenc_add_frame(ffenc_context *ffe_context, camera_buffer_t* buf)
 
     return FFENC_OK;
 }
-
+#endif

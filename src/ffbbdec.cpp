@@ -19,6 +19,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
+#ifndef OSX_PLATFORM
 typedef struct
 {
     screen_context_t screen_context;
@@ -27,12 +28,15 @@ typedef struct
     screen_buffer_t screen_pixel_buffer;
     int stride;
 } ffdec_view;
+#endif
 
 typedef struct
 {
     bool running;
     bool open;
+#ifndef OSX_PLATFORM
     ffdec_view *view;
+#endif
     void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, void *arg);
     void *frame_callback_arg;
     int (*read_callback)(ffdec_context *ffd_context, uint8_t *buf, ssize_t size, void *arg);
@@ -42,7 +46,10 @@ typedef struct
 } ffdec_reserved;
 
 void* decoding_thread(void* arg);
+
+#ifndef OSX_PLATFORM
 void display_frame(ffdec_context *ffd_context, AVFrame *frame);
+#endif
 
 ffdec_context *ffdec_alloc()
 {
@@ -57,9 +64,11 @@ ffdec_context *ffdec_alloc()
 void ffdec_reset(ffdec_context *ffd_context)
 {
     ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-
+    
+#ifndef OSX_PLATFORM
     // don't carry over the view, it needs to be recreated
     if (ffd_reserved && ffd_reserved->view) free(ffd_reserved->view);
+#endif
 
     if (!ffd_reserved) ffd_reserved = (ffdec_reserved*) malloc(sizeof(ffdec_reserved));
     memset(ffd_reserved, 0, sizeof(ffdec_reserved));
@@ -124,9 +133,11 @@ ffdec_error ffdec_free(ffdec_context *ffd_context)
     if (ffd_context->reserved)
     {
         ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-
+        
+#ifndef OSX_PLATFORM
         if (ffd_reserved->view) free(ffd_reserved->view);
         ffd_reserved->view = NULL;
+#endif
 
         free(ffd_context->reserved);
         ffd_context->reserved = NULL;
@@ -206,8 +217,10 @@ void* decoding_thread(void* arg)
             {
                 if (ffd_reserved->frame_callback) ffd_reserved->frame_callback(
                         ffd_context, frame, ffd_reserved->frame_callback_arg);
-
+                
+#ifndef OSX_PLATFORM
                 display_frame(ffd_context, frame);
+#endif
             }
 
             packet.size -= decode_result;
@@ -229,8 +242,10 @@ void* decoding_thread(void* arg)
         {
             if (ffd_reserved->frame_callback) ffd_reserved->frame_callback(
                     ffd_context, frame, ffd_reserved->frame_callback_arg);
-
+            
+#ifndef OSX_PLATFORM
             display_frame(ffd_context, frame);
+#endif
         }
     }
 
@@ -243,6 +258,7 @@ void* decoding_thread(void* arg)
     return 0;
 }
 
+#ifndef OSX_PLATFORM
 ffdec_error ffdec_create_view(ffdec_context *ffd_context, QString group, QString id, screen_window_t *window)
 {
     ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
@@ -370,3 +386,4 @@ void display_frame(ffdec_context *ffd_context, AVFrame *frame)
     int dirty_rects[] = { 0, 0, width, height };
     screen_post_window(screen_window, screen_buffer, 1, dirty_rects, 0);
 }
+#endif

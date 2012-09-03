@@ -30,8 +30,10 @@ extern "C"
 
 #include <sys/types.h>
 
+#ifndef OSX_PLATFORM
 #include <screen/screen.h>
 #include <QString>
+#endif
 
 typedef enum
 {
@@ -100,6 +102,8 @@ ffdec_error ffdec_start(ffdec_context *ffd_context);
  */
 ffdec_error ffdec_stop(ffdec_context *ffd_context);
 
+#ifndef OSX_PLATFORM
 ffdec_error ffdec_create_view(ffdec_context *ffd_context, QString group, QString id, screen_window_t *window);
+#endif
 
 #endif

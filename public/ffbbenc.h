@@ -30,7 +30,9 @@ extern "C"
 
 #include <sys/types.h>
 
+#ifndef OSX_PLATFORM
 #include <camera/camera_api.h>
+#endif
 
 typedef enum
 {
@@ -107,10 +109,12 @@ ffenc_error ffenc_stop(ffenc_context *ffe_context);
  */
 ffenc_error ffenc_add_frame(ffenc_context *ffe_context, AVFrame *frame);
 
+#ifndef OSX_PLATFORM
 /**
  * Add a frame from the native camera API.
  * This should have a buf->frametype of CAMERA_FRAMETYPE_NV12.
  */
 ffenc_error ffenc_add_frame(ffenc_context *ffe_context, camera_buffer_t* buf);
+#endif
 
 #endif
