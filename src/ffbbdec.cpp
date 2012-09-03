@@ -360,21 +360,21 @@ void display_frame(ffdec_context *ffd_context, AVFrame *frame)
     {
         int doff = i * stride;
         int soff = i * frame->linesize[0];
-        memcpy(&y[doff], &srcy[soff], frame->width);
+        memcpy(&y[doff], &srcy[soff], width);
     }
 
     for (int i = 0; i < height / 2; i++)
     {
         int doff = i * stride / 2;
         int soff = i * frame->linesize[1];
-        memcpy(&u[doff], &srcu[soff], frame->width / 2);
+        memcpy(&u[doff], &srcu[soff], width / 2);
     }
 
     for (int i = 0; i < height / 2; i++)
     {
         int doff = i * stride / 2;
         int soff = i * frame->linesize[2];
-        memcpy(&v[doff], &srcv[soff], frame->width / 2);
+        memcpy(&v[doff], &srcv[soff], width / 2);
     }
 
     screen_buffer_t screen_buffer;
