@@ -20,14 +20,19 @@ Visit the website at: [http://ffmpeg.org](http://ffmpeg.org)
 
 ## Building FFmpeg
 
-	$ # build (shared) libs for armle-v7
+	$ # build (shared) libs for QNX armle-v7
 	$ # to enable h.264 support add `--enable-gpl --enable-libx264 --extra-cflags=-I/workspace/libffbb/libx264/include --extra-ldflags=-L/workspace/libffbb/libx264/lib/armle-v7`
 	$ ./configure --enable-cross-compile --cross-prefix=arm-unknown-nto-qnx8.0.0eabi- --arch=armv7 --disable-debug --enable-optimizations --enable-asm --disable-static --enable-shared --target-os=qnx --disable-ffplay --disable-ffserver --disable-ffprobe --prefix=`pwd`/target  
 	$ make install
 
-	$ # build (static) libs for x86
+	$ # build (static) libs for QNX x86
 	$ # to enable h.264 support add `--enable-gpl --enable-libx264 --extra-cflags=-I/workspace/libffbb/libx264/include --extra-ldflags=-L/workspace/libffbb/libx264/lib/x86`
 	$ ./configure --enable-cross-compile --cross-prefix=i486-pc-nto-qnx8.0.0- --arch=x86 --disable-debug --enable-static --disable-shared --target-os=qnx --disable-ffplay --disable-ffserver --disable-ffprobe --disable-yasm --prefix=`pwd`/target  
+	$ make install
+	
+	$ # build (static) libs for x86_86
+	$ # to enable h.264 support add `--enable-gpl --enable-libx264 --extra-cflags=-I/workspace/libffbb/libx264/include --extra-ldflags=-L/workspace/libffbb/libx264/lib/x86`
+	$ ./configure --arch=x86_64 --disable-debug --enable-static --disable-shared --disable-ffplay --disable-ffserver --disable-ffprobe --disable-yasm --prefix=`pwd`/target
 	$ make install
 
 ## Compiling against FFmpeg
