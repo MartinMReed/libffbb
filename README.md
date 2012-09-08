@@ -47,19 +47,19 @@ Visit the website at: [http://ffmpeg.org](http://ffmpeg.org)
 	}
 	
 	INCLUDEPATH += ../ffmpeg/include
-	LIBS += -lcamapi -L../ffmpeg/lib/{gpl|lgpl}/$${ARCH} -lavformat -lavcodec -lavutil
+	LIBS += -lcamapi -L../ffmpeg/lib/{gpl|lgpl}/qnx/$${ARCH} -lavformat -lavcodec -lavutil
 
 ## Including FFmpeg in the BAR
 
 	<!-- include libs for armle-v7 -->
-	<asset path="ffmpeg/lib/{gpl|lgpl}/armle-v7/libavcodec.so.54">lib/libavcodec.so.54</asset>
-	<asset path="ffmpeg/lib/{gpl|lgpl}/armle-v7/libavformat.so.54">lib/libavformat.so.54</asset>
-	<asset path="ffmpeg/lib/{gpl|lgpl}/armle-v7/libavutil.so.51">lib/libavutil.so.51</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/qnx/armle-v7/libavcodec.so.54">lib/libavcodec.so.54</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/qnx/armle-v7/libavformat.so.54">lib/libavformat.so.54</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/qnx/armle-v7/libavutil.so.51">lib/libavutil.so.51</asset>
 	
 	<!-- include libs for x86 -->
-	<asset path="ffmpeg/lib/{gpl|lgpl}/x86/libavcodec.a">lib/libavcodec.a</asset>
-	<asset path="ffmpeg/lib/{gpl|lgpl}/x86/libavformat.a">lib/libavformat.a</asset>
-	<asset path="ffmpeg/lib/{gpl|lgpl}/x86/libavutil.a">lib/libavutil.a</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/qnx/x86/libavcodec.a">lib/libavcodec.a</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/qnx/x86/libavformat.a">lib/libavformat.a</asset>
+	<asset path="ffmpeg/lib/{gpl|lgpl}/qnx/x86/libavutil.a">lib/libavutil.a</asset>
 
 # H.264 Optional Support
 
@@ -94,4 +94,4 @@ Visit the website at: [http://www.videolan.org](http://www.videolan.org/develope
 
 # License
 
-While FFmpeg is either LGPL-v2.1 or GPL depending on how it is built, libffbb uses Apache License, Version 2.0.
+While FFmpeg is either LGPL or GPL depending on how it is built, libffbb uses Apache License, Version 2.0.
