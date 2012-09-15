@@ -32,12 +32,13 @@ typedef struct
 
 typedef struct
 {
+    int frame_index;
     bool running;
     bool open;
 #ifndef OSX_PLATFORM
     ffdec_view *view;
 #endif
-    void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, void *arg);
+    void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, int index, void *arg);
     void *frame_callback_arg;
     int (*read_callback)(ffdec_context *ffd_context, uint8_t *buf, ssize_t size, void *arg);
     void *read_callback_arg;
@@ -64,7 +65,7 @@ ffdec_context *ffdec_alloc()
 void ffdec_reset(ffdec_context *ffd_context)
 {
     ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-    
+
 #ifndef OSX_PLATFORM
     // don't carry over the view, it needs to be recreated
     if (ffd_reserved && ffd_reserved->view) free(ffd_reserved->view);
@@ -78,7 +79,7 @@ void ffdec_reset(ffdec_context *ffd_context)
 }
 
 ffdec_error ffdec_set_frame_callback(ffdec_context *ffd_context,
-        void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, void *arg),
+        void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, int index, void *arg),
         void *arg)
 {
     ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
@@ -133,7 +134,7 @@ ffdec_error ffdec_free(ffdec_context *ffd_context)
     if (ffd_context->reserved)
     {
         ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-        
+
 #ifndef OSX_PLATFORM
         if (ffd_reserved->view) free(ffd_reserved->view);
         ffd_reserved->view = NULL;
@@ -215,9 +216,11 @@ void* decoding_thread(void* arg)
 
             if (got_frame)
             {
+                ffd_reserved->frame_index++;
+
                 if (ffd_reserved->frame_callback) ffd_reserved->frame_callback(
-                        ffd_context, frame, ffd_reserved->frame_callback_arg);
-                
+                        ffd_context, frame, ffd_reserved->frame_index, ffd_reserved->frame_callback_arg);
+
 #ifndef OSX_PLATFORM
                 display_frame(ffd_context, frame);
 #endif
@@ -240,9 +243,11 @@ void* decoding_thread(void* arg)
 
         if (got_frame)
         {
+            ffd_reserved->frame_index++;
+
             if (ffd_reserved->frame_callback) ffd_reserved->frame_callback(
-                    ffd_context, frame, ffd_reserved->frame_callback_arg);
-            
+                    ffd_context, frame, ffd_reserved->frame_index, ffd_reserved->frame_callback_arg);
+
 #ifndef OSX_PLATFORM
             display_frame(ffd_context, frame);
 #endif

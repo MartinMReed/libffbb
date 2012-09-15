@@ -69,7 +69,7 @@ ffdec_context *ffdec_alloc(void);
 void ffdec_reset(ffdec_context *ffd_context);
 
 ffdec_error ffdec_set_frame_callback(ffdec_context *ffd_context,
-        void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, void *arg),
+        void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, int index, void *arg),
         void *arg);
 
 ffdec_error ffdec_set_read_callback(ffdec_context *ffd_context,

@@ -26,7 +26,8 @@ typedef struct
     pthread_mutex_t reading_mutex;
     pthread_cond_t read_cond;
     std::deque<AVFrame*> frames;
-    void (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, void *arg);
+    int frame_index;
+    void (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, int index, void *arg);
     void *frame_callback_arg;
     void (*write_callback)(ffenc_context *ffe_context, uint8_t *buf, ssize_t size, void *arg);
     void *write_callback_arg;
@@ -61,7 +62,7 @@ void ffenc_reset(ffenc_context *ffe_context)
 }
 
 ffenc_error ffenc_set_frame_callback(ffenc_context *ffe_context,
-        void (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, void *arg),
+        void (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, int index, void *arg),
         void *arg)
 {
     ffenc_reserved *ffe_reserved = (ffenc_reserved*) ffe_context->reserved;
@@ -177,8 +178,10 @@ void* encoding_thread(void* arg)
         AVFrame *frame = ffe_reserved->frames.front();
         ffe_reserved->frames.pop_front();
 
+        ffe_reserved->frame_index++;
+
         if (ffe_reserved->frame_callback) ffe_reserved->frame_callback(
-                ffe_context, frame, ffe_reserved->frame_callback_arg);
+                ffe_context, frame, ffe_reserved->frame_index, ffe_reserved->frame_callback_arg);
 
         // reset the AVPacket
         av_init_packet(&packet);
