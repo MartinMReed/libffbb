@@ -27,7 +27,7 @@ typedef struct
     pthread_cond_t read_cond;
     std::deque<AVFrame*> frames;
     int frame_index;
-    void (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, int index, void *arg);
+    bool (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, int index, void *arg);
     void *frame_callback_arg;
     void (*write_callback)(ffenc_context *ffe_context, uint8_t *buf, ssize_t size, void *arg);
     void *write_callback_arg;
@@ -62,7 +62,7 @@ void ffenc_reset(ffenc_context *ffe_context)
 }
 
 ffenc_error ffenc_set_frame_callback(ffenc_context *ffe_context,
-        void (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, int index, void *arg),
+        bool (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, int index, void *arg),
         void *arg)
 {
     ffenc_reserved *ffe_reserved = (ffenc_reserved*) ffe_context->reserved;
@@ -178,23 +178,30 @@ void* encoding_thread(void* arg)
         AVFrame *frame = ffe_reserved->frames.front();
         ffe_reserved->frames.pop_front();
 
-        ffe_reserved->frame_index++;
+        int frame_index = ffe_reserved->frame_index + 1;
 
-        if (ffe_reserved->frame_callback) ffe_reserved->frame_callback(
-                ffe_context, frame, ffe_reserved->frame_index, ffe_reserved->frame_callback_arg);
+        bool encode_frame = true;
 
-        // reset the AVPacket
-        av_init_packet(&packet);
-        packet.data = encode_buffer;
-        packet.size = encode_buffer_len;
+        if (ffe_reserved->frame_callback) encode_frame = ffe_reserved->frame_callback(
+                ffe_context, frame, frame_index, ffe_reserved->frame_callback_arg);
 
-        got_packet = 0;
-        int encode_result = avcodec_encode_video2(codec_context, &packet, frame, &got_packet);
-
-        if (encode_result == 0 && got_packet > 0)
+        if (encode_frame)
         {
-            if (ffe_reserved->write_callback) ffe_reserved->write_callback(ffe_context,
-                    packet.data, packet.size, ffe_reserved->write_callback_arg);
+            ffe_reserved->frame_index = frame_index;
+
+            // reset the AVPacket
+            av_init_packet(&packet);
+            packet.data = encode_buffer;
+            packet.size = encode_buffer_len;
+
+            got_packet = 0;
+            int encode_result = avcodec_encode_video2(codec_context, &packet, frame, &got_packet);
+
+            if (encode_result == 0 && got_packet > 0)
+            {
+                if (ffe_reserved->write_callback) ffe_reserved->write_callback(ffe_context,
+                        packet.data, packet.size, ffe_reserved->write_callback_arg);
+            }
         }
 
         free(frame->data[0]);

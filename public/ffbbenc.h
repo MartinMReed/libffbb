@@ -69,7 +69,7 @@ ffenc_context *ffenc_alloc(void);
 void ffenc_reset(ffenc_context *ffe_context);
 
 ffenc_error ffenc_set_frame_callback(ffenc_context *ffe_context,
-        void (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, int index, void *arg),
+        bool (*frame_callback)(ffenc_context *ffe_context, AVFrame *frame, int index, void *arg),
         void *arg);
 
 ffenc_error ffenc_set_write_callback(ffenc_context *ffe_context,
