@@ -16,6 +16,10 @@
 #ifndef FFBBDEC_H
 #define FFBBDEC_H
 
+#ifndef OSX_PLATFORM
+#define OSX_PLATFORM 0
+#endif
+
 // include math.h otherwise it will get included
 // by avformat.h and cause duplicate definition
 // errors because of C vs C++ functions
@@ -30,10 +34,12 @@ extern "C"
 
 #include <sys/types.h>
 
-#ifndef OSX_PLATFORM
+#if !OSX_PLATFORM
 #include <screen/screen.h>
 #include <QString>
 #endif
+
+void yuv_to_rgb(AVFrame *frame, unsigned char *rgb, int width, int height);
 
 typedef enum
 {
@@ -45,65 +51,93 @@ typedef enum
     FFDEC_ALREADY_STOPPED
 } ffdec_error;
 
+#if !OSX_PLATFORM
 typedef struct
 {
+    screen_context_t screen_context;
+    screen_window_t screen_window;
+    screen_buffer_t screen_buffer[1];
+    screen_buffer_t screen_pixel_buffer;
+    int stride;
+} ffdec_view;
+#endif
+
+class ffdec_context
+{
+    friend void* decoding_thread(void* arg);
+
+public:
+
+    ffdec_context();
+    virtual ~ffdec_context();
+
+    /**
+     * Reset the context with default values.
+     */
+    void reset();
+
+    ffdec_error set_frame_callback(
+            void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, int index, void *arg),
+            void *arg);
+
+    ffdec_error set_read_callback(
+            int (*read_callback)(ffdec_context *ffd_context, uint8_t *buf, ssize_t size, void *arg),
+            void *arg);
+
+    ffdec_error set_close_callback(
+            void (*close_callback)(ffdec_context *ffd_context, void *arg),
+            void *arg);
+
+    /**
+     * Start decoding the camera frames.
+     * Decoding will begin on a background thread.
+     */
+    ffdec_error start();
+
+    /**
+     * Stop decoding frames and kill the background thread.
+     */
+    ffdec_error stop();
+
+    /**
+     * Close the context.
+     * This will also close the AVCodecContext if not already closed.
+     */
+    ffdec_error close();
+
+#if !OSX_PLATFORM
+    ffdec_error create_view(QString group, QString id, screen_window_t *window);
+    #endif
+
     /**
      * The codec context to use for decoding.
      */
     AVCodecContext *codec_context;
 
-    /**
-     * For internal use. Do not use.
-     */
-    void *reserved;
-} ffdec_context;
+private:
 
-/**
- * Allocate the context with default values.
- */
-ffdec_context *ffdec_alloc(void);
+    void decoding_thread();
 
-/**
- * Reset the context with default values.
- */
-void ffdec_reset(ffdec_context *ffd_context);
+#if !OSX_PLATFORM
+    void display_frame(AVFrame *frame);
+    #endif
 
-ffdec_error ffdec_set_frame_callback(ffdec_context *ffd_context,
-        void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, int index, void *arg),
-        void *arg);
+    int frame_index;
+    bool running;
+    bool open;
 
-ffdec_error ffdec_set_read_callback(ffdec_context *ffd_context,
-        int (*read_callback)(ffdec_context *ffd_context, uint8_t *buf, ssize_t size, void *arg),
-        void *arg);
+#if !OSX_PLATFORM
+    ffdec_view *view;
+    #endif
 
-ffdec_error ffdec_set_close_callback(ffdec_context *ffd_context,
-        void (*close_callback)(ffdec_context *ffd_context, void *arg),
-        void *arg);
+    void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, int index, void *arg);
+    void *frame_callback_arg;
 
-/**
- * Close the context.
- * This will also close the AVCodecContext if not already closed.
- */
-ffdec_error ffdec_close(ffdec_context *ffd_context);
+    int (*read_callback)(ffdec_context *ffd_context, uint8_t *buf, ssize_t size, void *arg);
+    void *read_callback_arg;
 
-/**
- * Free the context.
- */
-ffdec_error ffdec_free(ffdec_context *ffd_context);
-
-/**
- * Start decoding the camera frames.
- * Decoding will begin on a background thread.
- */
-ffdec_error ffdec_start(ffdec_context *ffd_context);
-
-/**
- * Stop decoding frames and kill the background thread.
- */
-ffdec_error ffdec_stop(ffdec_context *ffd_context);
-
-#ifndef OSX_PLATFORM
-ffdec_error ffdec_create_view(ffdec_context *ffd_context, QString group, QString id, screen_window_t *window);
-#endif
+    void (*close_callback)(ffdec_context *ffd_context, void *arg);
+    void *close_callback_arg;
+};
 
 #endif

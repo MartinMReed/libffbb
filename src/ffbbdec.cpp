@@ -19,101 +19,80 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-#ifndef OSX_PLATFORM
-typedef struct
-{
-    screen_context_t screen_context;
-    screen_window_t screen_window;
-    screen_buffer_t screen_buffer[1];
-    screen_buffer_t screen_pixel_buffer;
-    int stride;
-} ffdec_view;
-#endif
-
-typedef struct
-{
-    int frame_index;
-    bool running;
-    bool open;
-#ifndef OSX_PLATFORM
-    ffdec_view *view;
-#endif
-    void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, int index, void *arg);
-    void *frame_callback_arg;
-    int (*read_callback)(ffdec_context *ffd_context, uint8_t *buf, ssize_t size, void *arg);
-    void *read_callback_arg;
-    void (*close_callback)(ffdec_context *ffd_context, void *arg);
-    void *close_callback_arg;
-} ffdec_reserved;
-
 void* decoding_thread(void* arg);
 
-#ifndef OSX_PLATFORM
-void display_frame(ffdec_context *ffd_context, AVFrame *frame);
+ffdec_context::ffdec_context()
+{
+    codec_context = 0;
+
+#if !OSX_PLATFORM
+    view = 0;
 #endif
 
-ffdec_context *ffdec_alloc()
-{
-    ffdec_context *ffd_context = (ffdec_context*) malloc(sizeof(ffdec_context));
-    memset(ffd_context, 0, sizeof(ffdec_context));
-
-    ffdec_reset(ffd_context);
-
-    return ffd_context;
+    reset();
 }
 
-void ffdec_reset(ffdec_context *ffd_context)
+ffdec_context::~ffdec_context()
 {
-    ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
+#if !OSX_PLATFORM
+    if (view) free(view);
+#endif
+}
 
-#ifndef OSX_PLATFORM
-    // don't carry over the view, it needs to be recreated
-    if (ffd_reserved && ffd_reserved->view) free(ffd_reserved->view);
+void ffdec_context::reset()
+{
+    frame_index = 0;
+    running = false;
+    open = false;
+
+#if !OSX_PLATFORM
+    if (view)
+    {
+        free(view);
+        view = 0;
+    }
 #endif
 
-    if (!ffd_reserved) ffd_reserved = (ffdec_reserved*) malloc(sizeof(ffdec_reserved));
-    memset(ffd_reserved, 0, sizeof(ffdec_reserved));
+    frame_callback = 0;
+    frame_callback_arg = 0;
 
-    memset(ffd_context, 0, sizeof(ffdec_context));
-    ffd_context->reserved = ffd_reserved;
+    read_callback = 0;
+    read_callback_arg = 0;
+
+    close_callback = 0;
+    close_callback_arg = 0;
 }
 
-ffdec_error ffdec_set_frame_callback(ffdec_context *ffd_context,
+ffdec_error ffdec_context::set_frame_callback(
         void (*frame_callback)(ffdec_context *ffd_context, AVFrame *frame, int index, void *arg),
         void *arg)
 {
-    ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-    if (!ffd_reserved) return FFDEC_NOT_INITIALIZED;
-    ffd_reserved->frame_callback = frame_callback;
-    ffd_reserved->frame_callback_arg = arg;
+    this->frame_callback = frame_callback;
+    frame_callback_arg = arg;
     return FFDEC_OK;
 }
 
-ffdec_error ffdec_set_read_callback(ffdec_context *ffd_context,
+ffdec_error ffdec_context::set_read_callback(
         int (*read_callback)(ffdec_context *ffd_context, uint8_t *buf, ssize_t size, void *arg),
         void *arg)
 {
-    ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-    if (!ffd_reserved) return FFDEC_NOT_INITIALIZED;
-    ffd_reserved->read_callback = read_callback;
-    ffd_reserved->read_callback_arg = arg;
+    this->read_callback = read_callback;
+    read_callback_arg = arg;
     return FFDEC_OK;
 }
 
-ffdec_error ffdec_set_close_callback(ffdec_context *ffd_context,
+ffdec_error ffdec_context::set_close_callback(
         void (*close_callback)(ffdec_context *ffd_context, void *arg),
         void *arg)
 {
-    ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-    if (!ffd_reserved) return FFDEC_NOT_INITIALIZED;
-    ffd_reserved->close_callback = close_callback;
-    ffd_reserved->close_callback_arg = arg;
+    this->close_callback = close_callback;
+    close_callback_arg = arg;
     return FFDEC_OK;
 }
 
-ffdec_error ffdec_close(ffdec_context *ffd_context)
+ffdec_error ffdec_context::close()
 {
-    AVCodecContext *codec_context = ffd_context->codec_context;
+    stop();
 
     if (codec_context)
     {
@@ -123,54 +102,30 @@ ffdec_error ffdec_close(ffdec_context *ffd_context)
         }
 
         av_free(codec_context);
-        codec_context = ffd_context->codec_context = NULL;
+        codec_context = 0;
     }
 
     return FFDEC_OK;
 }
 
-ffdec_error ffdec_free(ffdec_context *ffd_context)
+ffdec_error ffdec_context::start()
 {
-    if (ffd_context->reserved)
-    {
-        ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
+    if (running) return FFDEC_ALREADY_RUNNING;
+    if (!codec_context) return FFDEC_NO_CODEC_SPECIFIED;
 
-#ifndef OSX_PLATFORM
-        if (ffd_reserved->view) free(ffd_reserved->view);
-        ffd_reserved->view = NULL;
-#endif
-
-        free(ffd_context->reserved);
-        ffd_context->reserved = NULL;
-    }
-
-    free(ffd_context);
-
-    return FFDEC_OK;
-}
-
-ffdec_error ffdec_start(ffdec_context *ffd_context)
-{
-    ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-    if (!ffd_reserved) return FFDEC_NOT_INITIALIZED;
-    if (ffd_reserved->running) return FFDEC_ALREADY_RUNNING;
-    if (!ffd_context->codec_context) return FFDEC_NO_CODEC_SPECIFIED;
-
-    ffd_reserved->running = true;
+    running = true;
 
     pthread_t pthread;
-    pthread_create(&pthread, 0, &decoding_thread, ffd_context);
+    pthread_create(&pthread, 0, &::decoding_thread, this);
 
     return FFDEC_OK;
 }
 
-ffdec_error ffdec_stop(ffdec_context *ffd_context)
+ffdec_error ffdec_context::stop()
 {
-    ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-    if (!ffd_reserved) return FFDEC_NOT_INITIALIZED;
-    if (!ffd_reserved->running) return FFDEC_ALREADY_STOPPED;
+    if (!running) return FFDEC_ALREADY_STOPPED;
 
-    ffd_reserved->running = false;
+    running = false;
 
     return FFDEC_OK;
 }
@@ -178,9 +133,12 @@ ffdec_error ffdec_stop(ffdec_context *ffd_context)
 void* decoding_thread(void* arg)
 {
     ffdec_context *ffd_context = (ffdec_context*) arg;
-    ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-    AVCodecContext *codec_context = ffd_context->codec_context;
+    ffd_context->decoding_thread();
+    return 0;
+}
 
+void ffdec_context::decoding_thread()
+{
     AVPacket packet;
     int got_frame;
 
@@ -190,16 +148,15 @@ void* decoding_thread(void* arg)
 
     AVFrame *frame = avcodec_alloc_frame();
 
-    while (ffd_reserved->running)
+    while (running)
     {
-        if (ffd_reserved->read_callback) packet.size = ffd_reserved->read_callback(ffd_context,
-                decode_buffer, decode_buffer_length, ffd_reserved->read_callback_arg);
+        if (read_callback) packet.size = read_callback(this, decode_buffer, decode_buffer_length, read_callback_arg);
 
         if (packet.size <= 0) break;
 
         packet.data = decode_buffer;
 
-        while (ffd_reserved->running && packet.size > 0)
+        while (running && packet.size > 0)
         {
             // reset the AVPacket
             av_init_packet(&packet);
@@ -210,19 +167,18 @@ void* decoding_thread(void* arg)
             if (decode_result < 0)
             {
                 fprintf(stderr, "Error while decoding video\n");
-                ffd_reserved->running = false;
+                running = false;
                 break;
             }
 
             if (got_frame)
             {
-                ffd_reserved->frame_index++;
+                frame_index++;
 
-                if (ffd_reserved->frame_callback) ffd_reserved->frame_callback(
-                        ffd_context, frame, ffd_reserved->frame_index, ffd_reserved->frame_callback_arg);
+                if (frame_callback) frame_callback(this, frame, frame_index, frame_callback_arg);
 
-#ifndef OSX_PLATFORM
-                display_frame(ffd_context, frame);
+#if !OSX_PLATFORM
+                display_frame(frame);
 #endif
             }
 
@@ -231,11 +187,11 @@ void* decoding_thread(void* arg)
         }
     }
 
-    if (ffd_reserved->running)
+    if (running)
     {
         // reset the AVPacket
         av_init_packet(&packet);
-        packet.data = NULL;
+        packet.data = 0;
         packet.size = 0;
 
         got_frame = 0;
@@ -243,39 +199,31 @@ void* decoding_thread(void* arg)
 
         if (got_frame)
         {
-            ffd_reserved->frame_index++;
+            frame_index++;
 
-            if (ffd_reserved->frame_callback) ffd_reserved->frame_callback(
-                    ffd_context, frame, ffd_reserved->frame_index, ffd_reserved->frame_callback_arg);
+            if (frame_callback) frame_callback(this, frame, frame_index, frame_callback_arg);
 
-#ifndef OSX_PLATFORM
-            display_frame(ffd_context, frame);
+#if !OSX_PLATFORM
+            display_frame(frame);
 #endif
         }
     }
 
     av_free(frame);
-    frame = NULL;
+    frame = 0;
 
-    if (ffd_reserved->close_callback) ffd_reserved->close_callback(
-            ffd_context, ffd_reserved->close_callback_arg);
-
-    return 0;
+    if (close_callback) close_callback(this, close_callback_arg);
 }
 
-#ifndef OSX_PLATFORM
-ffdec_error ffdec_create_view(ffdec_context *ffd_context, QString group, QString id, screen_window_t *window)
+#if !OSX_PLATFORM
+ffdec_error ffdec_context::create_view(QString group, QString id, screen_window_t *window)
 {
-    ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-    if (!ffd_reserved) return FFDEC_NOT_INITIALIZED;
-
-    if (ffd_reserved->view)
+    if (this->view)
     {
-        *window = ffd_reserved->view->screen_window;
+        *window = this->view->screen_window;
         return FFDEC_OK;
     }
 
-    AVCodecContext *codec_context = ffd_context->codec_context;
     if (!codec_context) return FFDEC_NO_CODEC_SPECIFIED;
     if (!avcodec_is_open(codec_context)) return FFDEC_CODEC_NOT_OPEN;
 
@@ -331,15 +279,13 @@ ffdec_error ffdec_create_view(ffdec_context *ffd_context, QString group, QString
     *window = view->screen_window = screen_window;
     view->screen_pixel_buffer = screen_pixel_buffer;
     view->stride = stride;
-    ffd_reserved->view = view;
+    this->view = view;
 
     return FFDEC_OK;
 }
 
-void display_frame(ffdec_context *ffd_context, AVFrame *frame)
+void ffdec_context::display_frame(AVFrame *frame)
 {
-    ffdec_reserved *ffd_reserved = (ffdec_reserved*) ffd_context->reserved;
-    ffdec_view *view = ffd_reserved->view;
     if (!view) return;
 
     screen_window_t screen_window = view->screen_window;
@@ -347,7 +293,7 @@ void display_frame(ffdec_context *ffd_context, AVFrame *frame)
     screen_context_t screen_context = view->screen_context;
     int stride = view->stride;
 
-    unsigned char *ptr = NULL;
+    unsigned char *ptr = 0;
     screen_get_buffer_property_pv(screen_pixel_buffer, SCREEN_PROPERTY_POINTER, (void**) &ptr);
 
     int width = frame->width;
@@ -392,3 +338,40 @@ void display_frame(ffdec_context *ffd_context, AVFrame *frame)
     screen_post_window(screen_window, screen_buffer, 1, dirty_rects, 0);
 }
 #endif
+
+int clamp(float f)
+{
+    if (f < 0) return 0;
+    if (f > 255) return 255;
+    return f;
+}
+
+void yuv_to_rgb(AVFrame *frame, unsigned char *rgb, int width, int height)
+{
+    uint8_t *data_y = frame->data[0];
+    uint8_t *data_u = frame->data[1];
+    uint8_t *data_v = frame->data[2];
+    
+    int stride_y = frame->linesize[0];
+    int stride_u = frame->linesize[1];
+    int stride_v = frame->linesize[2];
+    
+    for (int y = 0; y < height; y++)
+    {
+        for ( int x = 0; x < width; x++)
+        {
+            float Y = (float)data_y[ y    * stride_y +  x   ];
+            float U = (float)data_u[(y/2) * stride_u + (x/2)];
+            float V = (float)data_v[(y/2) * stride_v + (x/2)];
+            
+            float R = ((1.164 * (Y - 16)) + (1.596 * (V - 128)));
+            float G = ((1.164 * (Y - 16)) - (0.813 * (V - 128)) - (0.391 * (U - 128)));
+            float B = ((1.164 * (Y - 16)) + (2.018 * (U - 128)));
+            
+            *rgb++ = 0;
+            *rgb++ = clamp(R);
+            *rgb++ = clamp(G);
+            *rgb++ = clamp(B);
+        }
+    }
+}
